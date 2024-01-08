@@ -15,11 +15,11 @@ builder.Services.AddDbContext<SellPhoneContext>(option => option.UseMySQL(builde
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 
 app.UseHttpsRedirection();
 
