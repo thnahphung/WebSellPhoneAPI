@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using WebSellPhoneAPI.Entities;
+using WebSellPhoneAPI.Models;
 
 namespace WebSellPhoneAPI.Controllers
 {
@@ -57,7 +57,7 @@ namespace WebSellPhoneAPI.Controllers
                 return NotFound();
             }
             var diachis = await _context.Diachis
-            .Where(d => d.IdNd == id) // Giả sử có một trường NguoidungId trong bảng Diachis để liên kết với người dùng
+            .Where(d => d.IdNd == id && d.Trangthai != 0) // Giả sử có một trường NguoidungId trong bảng Diachis để liên kết với người dùng
             .ToListAsync();
 
 
@@ -124,7 +124,7 @@ namespace WebSellPhoneAPI.Controllers
                 return NotFound();
             }
 
-            _context.Diachis.Remove(diachi);
+            diachi.Trangthai = 0;
             await _context.SaveChangesAsync();
 
             return NoContent();

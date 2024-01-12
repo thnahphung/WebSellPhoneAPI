@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace WebSellPhoneAPI.Entities;
+namespace WebSellPhoneAPI.Models;
 
 public partial class Nhacungcap
 {
