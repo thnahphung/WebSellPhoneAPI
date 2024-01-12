@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using WebSellPhoneAPI.Entities;
+using WebSellPhoneAPI.Models;
 
 namespace WebSellPhoneAPI.Controllers
 {
@@ -54,7 +54,7 @@ namespace WebSellPhoneAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutChitietdonhang(int id, Chitietdonhang chitietdonhang)
         {
-            if (id != chitietdonhang.IdDh)
+            if (id != chitietdonhang.Id)
             {
                 return BadRequest();
             }
@@ -96,7 +96,7 @@ namespace WebSellPhoneAPI.Controllers
             }
             catch (DbUpdateException)
             {
-                if (ChitietdonhangExists(chitietdonhang.IdDh))
+                if (ChitietdonhangExists(chitietdonhang.Id))
                 {
                     return Conflict();
                 }
@@ -106,7 +106,7 @@ namespace WebSellPhoneAPI.Controllers
                 }
             }
 
-            return CreatedAtAction("GetChitietdonhang", new { id = chitietdonhang.IdDh }, chitietdonhang);
+            return CreatedAtAction("GetChitietdonhang", new { id = chitietdonhang.Id }, chitietdonhang);
         }
 
         // DELETE: api/Chitietdonhangs/5
@@ -131,7 +131,7 @@ namespace WebSellPhoneAPI.Controllers
 
         private bool ChitietdonhangExists(int id)
         {
-            return (_context.Chitietdonhangs?.Any(e => e.IdDh == id)).GetValueOrDefault();
+            return (_context.Chitietdonhangs?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

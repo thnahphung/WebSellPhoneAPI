@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using WebSellPhoneAPI.Entities;
+using WebSellPhoneAPI.Models;
 using WebSellPhoneAPI.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
