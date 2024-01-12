@@ -28,21 +28,13 @@ namespace WebSellPhoneAPI.Controllers.Helper
                 return NotFound();
             }
 
-            var groupedProducts = _context.Sanphams.GroupBy(p => p.Tenviettat)
+            var groupedProducts = _context.Sanphams.Include(sp => sp.Hinhanhs)
+                                                    .GroupBy(p => p.Tenviettat)
                                                     .Select(group => new
                                                     {
                                                         Tenviettat = group.Key,
                                                         Thongtin = group.First(),
-                                                        PhanLoai = group.Select(p => new
-                                                        {
-                                                            Id = p.Id,
-                                                            TenSp = p.TenSp,
-                                                            Giagoc = p.Giagoc,
-                                                            Giadagiam = p.Giadagiam,
-                                                            Mausanpham = p.Mausanpham,
-                                                            Ram = p.Ram,
-                                                            Dungluong = p.Dungluong,
-                                                        })
+                                                        PhanLoai = group.ToArray()
                                                     });
 
             return await Task.FromResult(groupedProducts.ToList());
@@ -65,16 +57,7 @@ namespace WebSellPhoneAPI.Controllers.Helper
                     Tenviettat = group.Key,
                     Thongtin = group.First(),
                     Gia = group.First().Giadagiam,
-                    PhanLoai = group.Select(p => new
-                    {
-                        Id = p.Id,
-                        TenSp = p.TenSp,
-                        Giagoc = p.Giagoc,
-                        Giadagiam = p.Giadagiam,
-                        Mausanpham = p.Mausanpham,
-                        Ram = p.Ram,
-                        Dungluong = p.Dungluong,
-                    })
+                    PhanLoai = group.ToArray()
                 });
 
             var filteredProducts = groupedProducts.Where(group => string.IsNullOrEmpty(tenviettat) || group.Tenviettat.Contains(tenviettat));
@@ -101,7 +84,7 @@ namespace WebSellPhoneAPI.Controllers.Helper
             {
                 return NotFound();
             }
-            var sanphams = await _context.Sanphams.Where(sp => sp.Tenviettat == tenviettat).ToListAsync();
+            var sanphams = await _context.Sanphams.Include(sp => sp.Hinhanhs).Where(sp => sp.Tenviettat == tenviettat).ToListAsync();
 
             if (sanphams.Count == 0)
             {
@@ -112,18 +95,8 @@ namespace WebSellPhoneAPI.Controllers.Helper
             {
                 Tenviettat = sanphams.First().Tenviettat,
                 Thongtin = sanphams.First(),
-                PhanLoai = sanphams.Select(p => new
-                {
-                    Id = p.Id,
-                    TenSp = p.TenSp,
-                    Giagoc = p.Giagoc,
-                    Giadagiam = p.Giadagiam,
-                    Mausanpham = p.Mausanpham,
-                    Ram = p.Ram,
-                    Dungluong = p.Dungluong,
-                })
+                PhanLoai = sanphams.ToArray()
             };
-
 
             return sanpham;
         }

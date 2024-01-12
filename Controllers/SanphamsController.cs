@@ -24,22 +24,25 @@ namespace WebSellPhoneAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Sanpham>>> GetSanphams()
         {
-          if (_context.Sanphams == null)
-          {
-              return NotFound();
-          }
-            return await _context.Sanphams.ToListAsync();
+            if (_context.Sanphams == null)
+            {
+                return NotFound();
+            }
+            var sanphams = await _context.Sanphams.Include(sp => sp.Hinhanhs).ToListAsync();
+            return sanphams;
         }
 
         // GET: api/Sanphams/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Sanpham>> GetSanpham(int id)
         {
-          if (_context.Sanphams == null)
-          {
-              return NotFound();
-          }
-            var sanpham = await _context.Sanphams.FindAsync(id);
+            if (_context.Sanphams == null)
+            {
+                return NotFound();
+            }
+            //var sanpham = await _context.Sanphams.FindAsync(id);
+
+            var sanpham = await _context.Sanphams.Include(sp => sp.Hinhanhs).FirstOrDefaultAsync(sp => sp.Id == id);
 
             if (sanpham == null)
             {
@@ -85,10 +88,10 @@ namespace WebSellPhoneAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Sanpham>> PostSanpham(Sanpham sanpham)
         {
-          if (_context.Sanphams == null)
-          {
-              return Problem("Entity set 'SellPhoneContext.Sanphams'  is null.");
-          }
+            if (_context.Sanphams == null)
+            {
+                return Problem("Entity set 'SellPhoneContext.Sanphams'  is null.");
+            }
             _context.Sanphams.Add(sanpham);
             await _context.SaveChangesAsync();
 

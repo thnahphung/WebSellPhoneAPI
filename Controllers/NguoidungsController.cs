@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using BCryptNet = BCrypt.Net.BCrypt;
 using WebSellPhoneAPI.Models;
 
 namespace WebSellPhoneAPI.Controllers
@@ -24,10 +25,10 @@ namespace WebSellPhoneAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Nguoidung>>> GetNguoidungs()
         {
-          if (_context.Nguoidungs == null)
-          {
-              return NotFound();
-          }
+            if (_context.Nguoidungs == null)
+            {
+                return NotFound();
+            }
             return await _context.Nguoidungs.ToListAsync();
         }
 
@@ -35,10 +36,10 @@ namespace WebSellPhoneAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Nguoidung>> GetNguoidung(int id)
         {
-          if (_context.Nguoidungs == null)
-          {
-              return NotFound();
-          }
+            if (_context.Nguoidungs == null)
+            {
+                return NotFound();
+            }
             var nguoidung = await _context.Nguoidungs.FindAsync(id);
 
             if (nguoidung == null)
@@ -58,8 +59,19 @@ namespace WebSellPhoneAPI.Controllers
             {
                 return BadRequest();
             }
+            var existingUser = _context.Nguoidungs.FirstOrDefault(u => u.Sdt == nguoidung.Sdt);
 
-            _context.Entry(nguoidung).State = EntityState.Modified;
+            if (existingUser != null && existingUser.Id != nguoidung.Id)
+            {
+                return BadRequest("Số điện thoại đã được đăng kí.");
+            }
+
+            if (!string.IsNullOrEmpty(nguoidung.Matkhau) && nguoidung.Matkhau.Count() < 25)
+            {
+                nguoidung.Matkhau = BCryptNet.HashPassword(nguoidung.Matkhau);
+            }
+
+            _context.Update(nguoidung);
 
             try
             {
@@ -85,10 +97,10 @@ namespace WebSellPhoneAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Nguoidung>> PostNguoidung(Nguoidung nguoidung)
         {
-          if (_context.Nguoidungs == null)
-          {
-              return Problem("Entity set 'SellPhoneContext.Nguoidungs'  is null.");
-          }
+            if (_context.Nguoidungs == null)
+            {
+                return Problem("Entity set 'SellPhoneContext.Nguoidungs'  is null.");
+            }
             _context.Nguoidungs.Add(nguoidung);
             await _context.SaveChangesAsync();
 
