@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace WebSellPhoneAPI.Entities;
+namespace WebSellPhoneAPI.Models;
 
 public partial class SellPhoneContext : DbContext
 {
@@ -94,21 +94,28 @@ public partial class SellPhoneContext : DbContext
 
         modelBuilder.Entity<Chitietdonhang>(entity =>
         {
-            entity.HasKey(e => new { e.IdDh, e.IdSp }).HasName("PRIMARY");
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
 
             entity.ToTable("chitietdonhang");
 
-            entity.HasIndex(e => e.IdSp, "idSP");
+            entity.HasIndex(e => e.IdDh, "fk_ctdh_dh");
 
-            entity.Property(e => e.IdDh)
+            entity.HasIndex(e => e.IdSp, "fk_ctdh_sp");
+
+            entity.Property(e => e.Id)
                 .HasColumnType("int(11)")
-                .HasColumnName("idDH");
-            entity.Property(e => e.IdSp)
-                .HasColumnType("int(11)")
-                .HasColumnName("idSP");
+                .HasColumnName("id");
             entity.Property(e => e.Dongia)
                 .HasDefaultValueSql("'NULL'")
                 .HasColumnName("dongia");
+            entity.Property(e => e.IdDh)
+                .HasDefaultValueSql("'NULL'")
+                .HasColumnType("int(11)")
+                .HasColumnName("idDH");
+            entity.Property(e => e.IdSp)
+                .HasDefaultValueSql("'NULL'")
+                .HasColumnType("int(11)")
+                .HasColumnName("idSP");
             entity.Property(e => e.Soluong)
                 .HasDefaultValueSql("'NULL'")
                 .HasColumnType("int(11)")
@@ -126,21 +133,28 @@ public partial class SellPhoneContext : DbContext
             entity.HasOne(d => d.IdSpNavigation).WithMany(p => p.Chitietdonhangs)
                 .HasForeignKey(d => d.IdSp)
                 .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("chitietdonhang_ibfk_1");
+                .HasConstraintName("fk_ctdh_sp");
         });
 
         modelBuilder.Entity<Chitietgiohang>(entity =>
         {
-            entity.HasKey(e => new { e.IdNd, e.IdSp }).HasName("PRIMARY");
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
 
             entity.ToTable("chitietgiohang");
 
+            entity.HasIndex(e => e.IdNd, "fk_ctgh_nd");
+
             entity.HasIndex(e => e.IdSp, "fk_ctgh_sp");
 
+            entity.Property(e => e.Id)
+                .HasColumnType("int(11)")
+                .HasColumnName("id");
             entity.Property(e => e.IdNd)
+                .HasDefaultValueSql("'NULL'")
                 .HasColumnType("int(11)")
                 .HasColumnName("idND");
             entity.Property(e => e.IdSp)
+                .HasDefaultValueSql("'NULL'")
                 .HasColumnType("int(11)")
                 .HasColumnName("idSP");
             entity.Property(e => e.Soluong)

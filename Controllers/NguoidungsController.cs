@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using WebSellPhoneAPI.Entities;
 using BCryptNet = BCrypt.Net.BCrypt;
-
+using WebSellPhoneAPI.Models;
 
 namespace WebSellPhoneAPI.Controllers
 {
