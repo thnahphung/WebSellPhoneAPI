@@ -84,7 +84,10 @@ namespace WebSellPhoneAPI.Controllers.Helper
             {
                 return NotFound();
             }
-            var sanphams = await _context.Sanphams.Include(sp => sp.Hinhanhs).Where(sp => sp.Tenviettat == tenviettat).ToListAsync();
+            var sanphams = await _context.Sanphams.Include(sp => sp.Hinhanhs)
+                                                    .Include(s => s.Binhluans).ThenInclude(b => b.IdNdNavigation)
+                                                    .Where(sp => sp.Tenviettat == tenviettat)
+                                                    .ToListAsync();
 
             if (sanphams.Count == 0)
             {
