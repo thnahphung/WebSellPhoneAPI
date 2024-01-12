@@ -25,10 +25,10 @@ namespace WebSellPhoneAPI.Controllers.Helper
         [HttpGet("{id}")]
         public async Task<ActionResult<Nguoidung>> GetNguoidung(int id)
         {
-          if (_context.Nguoidungs == null)
-          {
-              return NotFound();
-          }
+            if (_context.Nguoidungs == null)
+            {
+                return NotFound();
+            }
             var nguoidung = await _context.Nguoidungs.FindAsync(id);
 
             if (nguoidung == null)
@@ -44,12 +44,22 @@ namespace WebSellPhoneAPI.Controllers.Helper
         [HttpPost]
         public async Task<ActionResult<Nguoidung>> PostNguoidung(Nguoidung nguoidung)
         {
-          if (_context.Nguoidungs == null)
-          {
-              return Problem("Entity set 'SellPhoneContext.Nguoidungs'  is null.");
-          }
-            nguoidung.Matkhau = BCryptNet.HashPassword(nguoidung.Matkhau);
+            if (_context.Nguoidungs == null)
+            {
+                return Problem("Entity set 'SellPhoneContext.Nguoidungs'  is null.");
+            }
 
+            var existingUser = _context.Nguoidungs.FirstOrDefault(u => u.Sdt == nguoidung.Sdt);
+            if (existingUser != null)
+            {
+                return BadRequest("Số điện thoại đã được đăng kí.");
+            }
+
+            nguoidung.Matkhau = BCryptNet.HashPassword(nguoidung.Matkhau);
+            nguoidung.Quyen = 0;
+            nguoidung.Ngaytao = DateTime.Now;
+            nguoidung.Ngaycapnhat = DateTime.Now;
+            nguoidung.Trangthai = 1;
             _context.Nguoidungs.Add(nguoidung);
             await _context.SaveChangesAsync();
 

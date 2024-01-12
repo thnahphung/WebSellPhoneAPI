@@ -36,11 +36,31 @@ namespace WebSellPhoneAPI.Controllers.Helper
             if (nguoidung.GoogleId != null)
             {
                 existingUser = await _context.Nguoidungs.FirstOrDefaultAsync(u => u.GoogleId == nguoidung.GoogleId);
+                if (existingUser == null)
+                {
+                    nguoidung.Quyen = 0;
+                    nguoidung.Ngaytao = DateTime.Now;
+                    nguoidung.Ngaycapnhat = DateTime.Now;
+                    nguoidung.Trangthai = 1;
+                    _context.Nguoidungs.Add(nguoidung);
+                    await _context.SaveChangesAsync();
+                    existingUser = await _context.Nguoidungs.FirstOrDefaultAsync(u => u.GoogleId == nguoidung.GoogleId);
+                }
             }
 
             if (nguoidung.FacebookId != null)
             {
                 existingUser = await _context.Nguoidungs.FirstOrDefaultAsync(u => u.FacebookId == nguoidung.FacebookId);
+                if (existingUser == null)
+                {
+                    nguoidung.Quyen = 0;
+                    nguoidung.Ngaytao = DateTime.Now;
+                    nguoidung.Ngaycapnhat = DateTime.Now;
+                    nguoidung.Trangthai = 1;
+                    _context.Nguoidungs.Add(nguoidung);
+                    await _context.SaveChangesAsync();
+                    existingUser = await _context.Nguoidungs.FirstOrDefaultAsync(u => u.FacebookId == nguoidung.FacebookId);
+                }
             }
 
             if (nguoidung.Matkhau != null && nguoidung.Sdt != null)
