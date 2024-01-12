@@ -40,7 +40,9 @@ namespace WebSellPhoneAPI.Controllers
             {
                 return NotFound();
             }
-            var sanpham = await _context.Sanphams.FindAsync(id);
+            //var sanpham = await _context.Sanphams.FindAsync(id);
+
+            var sanpham = await _context.Sanphams.Include(sp => sp.Hinhanhs).FirstOrDefaultAsync(sp => sp.Id == id);
 
             if (sanpham == null)
             {

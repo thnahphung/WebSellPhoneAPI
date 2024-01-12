@@ -28,7 +28,8 @@ namespace WebSellPhoneAPI.Controllers.Helper
                 return NotFound();
             }
 
-            var groupedProducts = _context.Sanphams.GroupBy(p => p.Tenviettat)
+            var groupedProducts = _context.Sanphams.Include(sp => sp.Hinhanhs)
+                                                    .GroupBy(p => p.Tenviettat)
                                                     .Select(group => new
                                                     {
                                                         Tenviettat = group.Key,
@@ -83,7 +84,7 @@ namespace WebSellPhoneAPI.Controllers.Helper
             {
                 return NotFound();
             }
-            var sanphams = await _context.Sanphams.Where(sp => sp.Tenviettat == tenviettat).ToListAsync();
+            var sanphams = await _context.Sanphams.Include(sp => sp.Hinhanhs).Where(sp => sp.Tenviettat == tenviettat).ToListAsync();
 
             if (sanphams.Count == 0)
             {
@@ -96,7 +97,6 @@ namespace WebSellPhoneAPI.Controllers.Helper
                 Thongtin = sanphams.First(),
                 PhanLoai = sanphams.ToArray()
             };
-
 
             return sanpham;
         }
