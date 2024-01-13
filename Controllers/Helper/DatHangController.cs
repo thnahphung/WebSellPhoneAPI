@@ -7,15 +7,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebSellPhoneAPI.Models;
 
-namespace WebSellPhoneAPI.Controllers
+namespace WebSellPhoneAPI.Controllers.Helper
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DonhangsController : ControllerBase
+    public class DatHangController : ControllerBase
     {
         private readonly SellPhoneContext _context;
 
-        public DonhangsController(SellPhoneContext context)
+        public DatHangController(SellPhoneContext context)
         {
             _context = context;
         }
@@ -89,7 +89,27 @@ namespace WebSellPhoneAPI.Controllers
           {
               return Problem("Entity set 'SellPhoneContext.Donhangs'  is null.");
           }
+
             _context.Donhangs.Add(donhang);
+            await _context.SaveChangesAsync();
+
+            var chitietgiohangs = await _context.Chitietgiohangs.Include(s => s.IdSpNavigation).Where(c => c.IdNd == donhang.IdNd && c.Trangthai != 0).ToListAsync();
+           // Get product in the cart TO GET PRICE
+           
+            foreach(Chitietgiohang c in chitietgiohangs)
+            {
+            Chitietdonhang chitietdonhang = new Chitietdonhang();
+                chitietdonhang.IdDh = donhang.Id;
+            chitietdonhang.IdSp = c.IdSp;
+            chitietdonhang.Soluong = c.Soluong;
+            chitietdonhang.Dongia = c.IdSpNavigation.Giadagiam * c.Soluong;
+            _context.Chitietdonhangs.Add(chitietdonhang);
+            }
+            foreach(Chitietgiohang c in chitietgiohangs)
+            {
+                 c.Trangthai = 0;
+            }
+
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetDonhang", new { id = donhang.Id }, donhang);
@@ -109,7 +129,7 @@ namespace WebSellPhoneAPI.Controllers
                 return NotFound();
             }
 
-            donhang.Trangthai = 0;
+            _context.Donhangs.Remove(donhang);
             await _context.SaveChangesAsync();
 
             return NoContent();

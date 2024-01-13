@@ -89,6 +89,7 @@ namespace WebSellPhoneAPI.Controllers
           {
               return Problem("Entity set 'SellPhoneContext.Chitietgiohangs'  is null.");
           }
+          
             _context.Chitietgiohangs.Add(chitietgiohang);
             try
             {
@@ -110,21 +111,28 @@ namespace WebSellPhoneAPI.Controllers
         }
 
         // DELETE: api/Chitietgiohangs/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteChitietgiohang(int id)
+        [HttpDelete("{idND}")]
+        public async Task<IActionResult> DeleteChitietgiohang(int idND)
         {
             if (_context.Chitietgiohangs == null)
             {
                 return NotFound();
             }
-            var chitietgiohang = await _context.Chitietgiohangs.FindAsync(id);
-            if (chitietgiohang == null)
+            var chitietgiohangs = await _context.Chitietgiohangs
+           .Where(c => c.IdNd == idND && c.Trangthai != 0) 
+           .ToListAsync();
+            if (chitietgiohangs == null || !chitietgiohangs.Any())
             {
                 return NotFound();
             }
 
-            _context.Chitietgiohangs.Remove(chitietgiohang);
+            foreach (Chitietgiohang c in chitietgiohangs)
+            {
+
+            c.Trangthai = 0;
+            }
             await _context.SaveChangesAsync();
+  
 
             return NoContent();
         }

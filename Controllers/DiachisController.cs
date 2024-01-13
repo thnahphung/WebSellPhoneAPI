@@ -57,7 +57,7 @@ namespace WebSellPhoneAPI.Controllers
                 return NotFound();
             }
             var diachis = await _context.Diachis
-            .Where(d => d.IdNd == id && d.Trangthai != 0) // Giả sử có một trường NguoidungId trong bảng Diachis để liên kết với người dùng
+            .Where(d => d.IdNd == id && d.Trangthai != 0) 
             .ToListAsync();
 
 
