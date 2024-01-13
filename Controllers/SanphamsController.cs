@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebSellPhoneAPI.Models;
+using WebSellPhoneAPI.Controllers.Helper;
 
 namespace WebSellPhoneAPI.Controllers
 {
@@ -63,7 +66,7 @@ namespace WebSellPhoneAPI.Controllers
 
             if (sanpham.TepHinhAnh.Length > 0)
             {
-                string fileName = sanpham.Tenviettat + Path.GetExtension(sanpham.TepHinhAnh.FileName).ToLower();
+                string fileName = sanpham.Tenviettat + "-" + ConvertVietNamese.convertToUnSign3(sanpham.Mausanpham) + Path.GetExtension(sanpham.TepHinhAnh.FileName).ToLower();
                 var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", fileName);
                 using (var stream = System.IO.File.Create(path))
                 {
@@ -126,7 +129,7 @@ namespace WebSellPhoneAPI.Controllers
 
             if (sanpham.TepHinhAnh.Length > 0)
             {
-                string fileName = sanpham.Tenviettat + Path.GetExtension(sanpham.TepHinhAnh.FileName).ToLower();
+                string fileName = sanpham.Tenviettat + "-" + ConvertVietNamese.convertToUnSign3(sanpham.Mausanpham) + Path.GetExtension(sanpham.TepHinhAnh.FileName).ToLower();
                 var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", fileName);
                 using (var stream = System.IO.File.Create(path))
                 {
@@ -178,5 +181,6 @@ namespace WebSellPhoneAPI.Controllers
         {
             return (_context.Sanphams?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+
     }
 }
