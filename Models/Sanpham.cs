@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebSellPhoneAPI.Models;
 
@@ -50,4 +51,7 @@ public partial class Sanpham
     public virtual ICollection<Hinhanh> Hinhanhs { get; set; } = new List<Hinhanh>();
 
     public virtual Nhacungcap? IdNccNavigation { get; set; }
+
+    [NotMapped]
+    public IFormFile? TepHinhAnh { get; set; }
 }
