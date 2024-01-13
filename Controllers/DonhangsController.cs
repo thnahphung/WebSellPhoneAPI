@@ -109,7 +109,7 @@ namespace WebSellPhoneAPI.Controllers
                 return NotFound();
             }
 
-            _context.Donhangs.Remove(donhang);
+            donhang.Trangthai = 0;
             await _context.SaveChangesAsync();
 
             return NoContent();
