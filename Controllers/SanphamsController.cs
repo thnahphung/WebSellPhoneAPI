@@ -84,7 +84,7 @@ namespace WebSellPhoneAPI.Controllers
                 {
                     hinhanh = new Hinhanh();
                     hinhanh.IdSp = sanpham.Id;
-                    hinhanh.Url = "/images/" + fileName;
+                    hinhanh.Url = "http://103.77.214.148/images/" + fileName;
                     _context.Hinhanhs.Add(hinhanh);
                 }
                 await _context.SaveChangesAsync();
@@ -139,7 +139,7 @@ namespace WebSellPhoneAPI.Controllers
 
                 Hinhanh hinhanh = new Hinhanh();
                 hinhanh.IdSp = sanpham.Id;
-                hinhanh.Url = "/images/" + fileName;
+                hinhanh.Url = "http://103.77.214.148/images/" + fileName;
 
                 _context.Hinhanhs.Add(hinhanh);
                 await _context.SaveChangesAsync();
