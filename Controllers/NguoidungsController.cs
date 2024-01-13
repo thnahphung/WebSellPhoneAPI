@@ -71,7 +71,27 @@ namespace WebSellPhoneAPI.Controllers
                 nguoidung.Matkhau = BCryptNet.HashPassword(nguoidung.Matkhau);
             }
 
-            _context.Update(nguoidung);
+            if (existingUser == null)
+            {
+                _context.Update(nguoidung);
+            }
+            else
+            {
+                existingUser.Ten = nguoidung.Ten;
+                existingUser.Sdt = nguoidung.Sdt;
+                existingUser.Gioitinh = nguoidung.Gioitinh;
+                existingUser.Email = nguoidung.Email;
+                existingUser.Matkhau = nguoidung.Matkhau;
+                existingUser.Anhdaidien = nguoidung.Anhdaidien;
+                existingUser.Quyen = nguoidung.Quyen;
+                existingUser.GoogleId = nguoidung.GoogleId;
+                existingUser.FacebookId = nguoidung.FacebookId;
+                existingUser.Ngaytao = nguoidung.Ngaytao;
+                existingUser.Ngaycapnhat = nguoidung.Ngaycapnhat;
+                existingUser.Trangthai = nguoidung.Trangthai;
+            }
+
+
 
             try
             {
