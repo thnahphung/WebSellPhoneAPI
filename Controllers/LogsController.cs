@@ -118,7 +118,7 @@ namespace WebSellPhoneAPI.Controllers
                 return NotFound();
             }
 
-            _context.Logs.Remove(log);
+            log.Trangthai = 0;
             await _context.SaveChangesAsync();
 
             return NoContent();
