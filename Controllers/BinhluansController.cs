@@ -109,7 +109,7 @@ namespace WebSellPhoneAPI.Controllers
                 return NotFound();
             }
 
-            _context.Binhluans.Remove(binhluan);
+            binhluan.Trangthai = 0;
             await _context.SaveChangesAsync();
 
             return NoContent();

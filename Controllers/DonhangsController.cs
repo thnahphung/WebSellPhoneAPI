@@ -48,6 +48,31 @@ namespace WebSellPhoneAPI.Controllers
 
             return donhang;
         }
+        // GET: api/Donhangs/Nguoidung/5
+        [HttpGet("Nguoidung/{userId}")]
+        public async Task<ActionResult<List<Donhang>>> GetDonhangByUserId(int userId)
+        {
+            if (_context.Donhangs == null)
+            {
+                return NotFound();
+            }
+            var donhangs = await _context.Donhangs.Where(d => d.IdNd == userId && d.Trangthai != 0).ToListAsync();
+
+            if (donhangs == null)
+            {
+                return NotFound();
+            }
+            foreach (Donhang d in donhangs)
+            {
+            var chitietdonhangs = await _context.Chitietdonhangs.Where(c => c.IdDh == d.Id).ToListAsync();
+                foreach(Chitietdonhang c in chitietdonhangs)
+                {
+                    d.Chitietdonhangs.Add(c);
+                }
+            }
+
+            return donhangs;
+        }
 
         // PUT: api/Donhangs/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -92,6 +117,13 @@ namespace WebSellPhoneAPI.Controllers
             _context.Donhangs.Add(donhang);
             await _context.SaveChangesAsync();
 
+            foreach (Chitietdonhang c in donhang.Chitietdonhangs)
+            {
+                c.IdSpNavigation = await _context.Sanphams.FindAsync(c.IdSp);
+                c.Dongia = c.IdSpNavigation.Giadagiam * c.Soluong;
+            }
+            await _context.SaveChangesAsync();
+         
             return CreatedAtAction("GetDonhang", new { id = donhang.Id }, donhang);
         }
 
