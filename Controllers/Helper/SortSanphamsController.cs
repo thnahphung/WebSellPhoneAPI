@@ -7,52 +7,49 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebSellPhoneAPI.Models;
 
-namespace WebSellPhoneAPI.Controllers
+namespace WebSellPhoneAPI.Controllers.Helper
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SanphamsController : ControllerBase
+    public class SortSanphamsController : ControllerBase
     {
         private readonly SellPhoneContext _context;
 
-        public SanphamsController(SellPhoneContext context)
+        public SortSanphamsController(SellPhoneContext context)
         {
             _context = context;
         }
 
-        // GET: api/Sanphams
+        // GET: api/SortSanphamsByPrice
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Sanpham>>> GetSanphams()
+        public async Task<ActionResult<IEnumerable<Sanpham>>> GetSanphamsSortedByPrice()
         {
-            if (_context.Sanphams == null)
+          if (_context.Sanphams == null)
+          {
+              return NotFound();
+          }
+            return await _context.Sanphams.OrderBy(s => -s.Giagoc).ToListAsync();
+        }
+
+        // GET: api/GetSanphamsByThuongHieu
+        [HttpGet("ThuongHieu/{idNCC}")]
+        public async Task<ActionResult<List<Sanpham>>> GetSanphamsByBrand(int idNCC)
+        {
+          if (_context.Sanphams == null)
+          {
+              return NotFound();
+          }
+            var sanphams = await _context.Sanphams.Where(s => s.IdNcc == idNCC && s.Trangthai != 0).ToListAsync();
+
+            if (sanphams == null)
             {
                 return NotFound();
             }
-            var sanphams = await _context.Sanphams.Include(sp => sp.Hinhanhs).ToListAsync();
+
             return sanphams;
         }
 
-        // GET: api/Sanphams/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Sanpham>> GetSanpham(int id)
-        {
-            if (_context.Sanphams == null)
-            {
-                return NotFound();
-            }
-            //var sanpham = await _context.Sanphams.FindAsync(id);
-
-            var sanpham = await _context.Sanphams.Include(sp => sp.Hinhanhs).FirstOrDefaultAsync(sp => sp.Id == id);
-
-            if (sanpham == null)
-            {
-                return NotFound();
-            }
-
-            return sanpham;
-        }
-
-        // PUT: api/Sanphams/5
+        // PUT: api/SortSanphams/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutSanpham(int id, Sanpham sanpham)
@@ -83,22 +80,22 @@ namespace WebSellPhoneAPI.Controllers
             return NoContent();
         }
 
-        // POST: api/Sanphams
+        // POST: api/SortSanphams
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Sanpham>> PostSanpham(Sanpham sanpham)
         {
-            if (_context.Sanphams == null)
-            {
-                return Problem("Entity set 'SellPhoneContext.Sanphams'  is null.");
-            }
+          if (_context.Sanphams == null)
+          {
+              return Problem("Entity set 'SellPhoneContext.Sanphams'  is null.");
+          }
             _context.Sanphams.Add(sanpham);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetSanpham", new { id = sanpham.Id }, sanpham);
         }
 
-        // DELETE: api/Sanphams/5
+        // DELETE: api/SortSanphams/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSanpham(int id)
         {
@@ -112,7 +109,7 @@ namespace WebSellPhoneAPI.Controllers
                 return NotFound();
             }
 
-            sanpham.Trangthai = 0;
+            _context.Sanphams.Remove(sanpham);
             await _context.SaveChangesAsync();
 
             return NoContent();

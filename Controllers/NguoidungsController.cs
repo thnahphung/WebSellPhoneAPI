@@ -121,6 +121,10 @@ namespace WebSellPhoneAPI.Controllers
             {
                 return Problem("Entity set 'SellPhoneContext.Nguoidungs'  is null.");
             }
+            if (_context.Nguoidungs.Where(n => n.Email == nguoidung.Email || n.Sdt == nguoidung.Sdt).Count() != 0)
+            {
+                return Problem("Account already exists");
+            }
             _context.Nguoidungs.Add(nguoidung);
             await _context.SaveChangesAsync();
 
