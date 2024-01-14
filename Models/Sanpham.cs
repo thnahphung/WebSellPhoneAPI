@@ -51,7 +51,8 @@ public partial class Sanpham
     public virtual ICollection<Hinhanh> Hinhanhs { get; set; } = new List<Hinhanh>();
 
     public virtual Nhacungcap? IdNccNavigation { get; set; }
-
     [NotMapped]
-    public IFormFile? TepHinhAnh { get; set; }
+    public string? TepHinhAnh { get; set; }
+    [NotMapped]
+    public string? TenTepHinhAnh { get; set; }
 }

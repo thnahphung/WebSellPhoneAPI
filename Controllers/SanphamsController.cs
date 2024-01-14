@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebSellPhoneAPI.Models;
 using WebSellPhoneAPI.Controllers.Helper;
+using System.Drawing;
 
 namespace WebSellPhoneAPI.Controllers
 {
@@ -57,46 +58,36 @@ namespace WebSellPhoneAPI.Controllers
         // PUT: api/Sanphams/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutSanpham(int id, [FromForm] Sanpham sanpham)
+        public async Task<IActionResult> PutSanpham(int id, Sanpham sanpham)
         {
             if (id != sanpham.Id)
             {
                 return BadRequest();
             }
 
-            if (sanpham.TepHinhAnh.Length > 0)
+            string fileName = sanpham.Tenviettat + "-" + Global.convertToUnSign3(sanpham.Mausanpham) + Path.GetExtension(sanpham.TenTepHinhAnh).ToLower();
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", fileName);
+
+            Global.SaveImg(sanpham.TepHinhAnh, path);
+
+            sanpham.TepHinhAnh = null;
+            _context.Sanphams.Update(sanpham);
+            await _context.SaveChangesAsync();
+
+            var hinhanh = _context.Hinhanhs.FirstOrDefault(h => h.IdSp == sanpham.Id);
+            if (hinhanh != null)
             {
-                string fileName = sanpham.Tenviettat + "-" + ConvertVietNamese.convertToUnSign3(sanpham.Mausanpham) + Path.GetExtension(sanpham.TepHinhAnh.FileName).ToLower();
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", fileName);
-                using (var stream = System.IO.File.Create(path))
-                {
-                    await sanpham.TepHinhAnh.CopyToAsync(stream);
-                }
-
-                sanpham.TepHinhAnh = null;
-                _context.Sanphams.Update(sanpham);
-                await _context.SaveChangesAsync();
-
-                var hinhanh = _context.Hinhanhs.FirstOrDefault(h => h.IdSp == sanpham.Id);
-                if (hinhanh != null)
-                {
-                    hinhanh.Url = "/images/" + fileName;
-                    _context.Hinhanhs.Update(hinhanh);
-                }
-                else
-                {
-                    hinhanh = new Hinhanh();
-                    hinhanh.IdSp = sanpham.Id;
-                    hinhanh.Url = "http://103.77.214.148/images/" + fileName;
-                    _context.Hinhanhs.Add(hinhanh);
-                }
-                await _context.SaveChangesAsync();
+                hinhanh.Url = "http://103.77.214.148/images/" + fileName;
+                _context.Hinhanhs.Update(hinhanh);
             }
             else
             {
-                _context.Sanphams.Update(sanpham);
-                await _context.SaveChangesAsync();
+                hinhanh = new Hinhanh();
+                hinhanh.IdSp = sanpham.Id;
+                hinhanh.Url = "http://103.77.214.148/images/" + fileName;
+                _context.Hinhanhs.Add(hinhanh);
             }
+            await _context.SaveChangesAsync();
 
             try
             {
@@ -120,38 +111,28 @@ namespace WebSellPhoneAPI.Controllers
         // POST: api/Sanphams
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Sanpham>> PostSanpham([FromForm] Sanpham sanpham)
+        public async Task<ActionResult<Sanpham>> PostSanpham(Sanpham sanpham)
         {
             if (_context.Sanphams == null)
             {
                 return Problem("Entity set 'SellPhoneContext.Sanphams'  is null.");
             }
 
-            if (sanpham.TepHinhAnh.Length > 0)
-            {
-                string fileName = sanpham.Tenviettat + "-" + ConvertVietNamese.convertToUnSign3(sanpham.Mausanpham) + Path.GetExtension(sanpham.TepHinhAnh.FileName).ToLower();
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", fileName);
-                using (var stream = System.IO.File.Create(path))
-                {
-                    await sanpham.TepHinhAnh.CopyToAsync(stream);
-                }
+            string fileName = sanpham.Tenviettat + "-" + Global.convertToUnSign3(sanpham.Mausanpham) + Path.GetExtension(sanpham.TenTepHinhAnh).ToLower();
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", fileName);
 
-                sanpham.TepHinhAnh = null;
-                await _context.Sanphams.AddAsync(sanpham);
-                await _context.SaveChangesAsync();
+            Global.SaveImg(sanpham.TepHinhAnh, path);
 
-                Hinhanh hinhanh = new Hinhanh();
-                hinhanh.IdSp = sanpham.Id;
-                hinhanh.Url = "http://103.77.214.148/images/" + fileName;
+            sanpham.TepHinhAnh = null;
+            await _context.Sanphams.AddAsync(sanpham);
+            await _context.SaveChangesAsync();
 
-                _context.Hinhanhs.Add(hinhanh);
-                await _context.SaveChangesAsync();
-            }
-            else
-            {
-                _context.Sanphams.Add(sanpham);
-                await _context.SaveChangesAsync();
-            }
+            Hinhanh hinhanh = new Hinhanh();
+            hinhanh.IdSp = sanpham.Id;
+            hinhanh.Url = "http://103.77.214.148/images/" + fileName;
+
+            _context.Hinhanhs.Add(hinhanh);
+            await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetSanpham", new { id = sanpham.Id }, sanpham);
         }
