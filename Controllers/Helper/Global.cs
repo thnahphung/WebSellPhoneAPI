@@ -30,5 +30,18 @@ namespace WebSellPhoneAPI.Controllers.Helper
                 image.Save(savePath, new PngEncoder());
             }
         }
+        public static void changeFileName(string path, string newName)
+        {
+            if (File.Exists(path))
+            {
+                string newFilePath = Path.Combine(Path.GetDirectoryName(path), newName);
+                File.Move(path, newFilePath);
+            }
+        }
+        public static string GetFileNameFromUrl(string url)
+        {
+            string[] parts = url.Split('/');
+            return parts[parts.Length - 1];
+        }
     }
 }
