@@ -49,6 +49,27 @@ namespace WebSellPhoneAPI.Controllers
             return chitietgiohang;
         }
 
+        // GET: api/Chitietgiohangs/Nguoidung/1
+        [HttpGet("Nguoidung/{userId}")]
+        public async Task<ActionResult<List<Chitietgiohang>>> GetChitietgiohangByUserId(int userId)
+        {
+            if (_context.Chitietgiohangs == null)
+            {
+                return NotFound();
+            }
+            var chitietgiohangs = await _context.Chitietgiohangs.Where(c => c.IdNd == userId && c.Trangthai != 0).ToListAsync();
+            
+            if (chitietgiohangs == null || !chitietgiohangs.Any())
+            {
+                return NotFound();
+            }
+            foreach(Chitietgiohang c in chitietgiohangs)
+            {
+                c.IdSpNavigation = await _context.Sanphams.FindAsync(c.IdSp);
+            }
+
+            return chitietgiohangs;
+        }
         // PUT: api/Chitietgiohangs/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
