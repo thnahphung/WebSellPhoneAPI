@@ -65,7 +65,30 @@ namespace WebSellPhoneAPI.Controllers
                 return BadRequest();
             }
 
-            string fileName = sanpham.Tenviettat + "-" + Global.convertToUnSign3(sanpham.Mausanpham) + Path.GetExtension(sanpham.TenTepHinhAnh).ToLower();
+
+            if (string.IsNullOrEmpty(sanpham.TepHinhAnh))
+            {
+                var image = _context.Hinhanhs.Where(h => h.IdSp == sanpham.Id).FirstOrDefault();
+                if (image != null)
+                {
+                    string newFileName = sanpham.Tenviettat + "-" + Global.convertToUnSign3(sanpham.Mausanpham) + "-" + sanpham.Dungluong.Replace(" ", "") + "-" + sanpham.Ram.Replace(" ", "") + Path.GetExtension(Global.GetFileNameFromUrl(image.Url)).ToLower();
+                    string newPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", newFileName);
+                    if (image.Url.Substring(0, 19) != "https://cdn.tgdd.vn")
+                    {
+                        var oldPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", Global.GetFileNameFromUrl(image.Url));
+                        Global.changeFileName(oldPath, newFileName);
+                        image.Url = "http://103.77.214.148/images/" + newFileName;
+                    }
+                    _context.Hinhanhs.Update(image);
+                    await _context.SaveChangesAsync();
+                }
+
+                _context.Sanphams.Update(sanpham);
+                await _context.SaveChangesAsync();
+                return CreatedAtAction("GetSanpham", new { id = sanpham.Id }, sanpham);
+            }
+
+            string fileName = sanpham.Tenviettat + "-" + Global.convertToUnSign3(sanpham.Mausanpham) + "-" + sanpham.Dungluong.Replace(" ", "") + "-" + sanpham.Ram.Replace(" ", "") + Path.GetExtension(sanpham.TenTepHinhAnh).ToLower();
             var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", fileName);
 
             Global.SaveImg(sanpham.TepHinhAnh, path);
@@ -105,7 +128,7 @@ namespace WebSellPhoneAPI.Controllers
                 }
             }
 
-            return NoContent();
+            return CreatedAtAction("GetSanpham", new { id = sanpham.Id }, sanpham);
         }
 
         // POST: api/Sanphams
@@ -118,7 +141,14 @@ namespace WebSellPhoneAPI.Controllers
                 return Problem("Entity set 'SellPhoneContext.Sanphams'  is null.");
             }
 
-            string fileName = sanpham.Tenviettat + "-" + Global.convertToUnSign3(sanpham.Mausanpham) + Path.GetExtension(sanpham.TenTepHinhAnh).ToLower();
+            if (string.IsNullOrEmpty(sanpham.TepHinhAnh))
+            {
+                await _context.Sanphams.AddAsync(sanpham);
+                await _context.SaveChangesAsync();
+                return CreatedAtAction("GetSanpham", new { id = sanpham.Id }, sanpham);
+            }
+
+            string fileName = sanpham.Tenviettat + "-" + Global.convertToUnSign3(sanpham.Mausanpham) + "-" + sanpham.Dungluong.Replace(" ", "") + "-" + sanpham.Ram.Replace(" ", "") + Path.GetExtension(sanpham.TenTepHinhAnh).ToLower();
             var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", fileName);
 
             Global.SaveImg(sanpham.TepHinhAnh, path);
