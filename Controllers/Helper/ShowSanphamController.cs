@@ -29,6 +29,7 @@ namespace WebSellPhoneAPI.Controllers.Helper
             }
 
             var groupedProducts = _context.Sanphams.Include(sp => sp.Hinhanhs)
+                                                    .Where(sp => sp.Trangthai != 0)
                                                     .GroupBy(p => p.Tenviettat)
                                                     .Select(group => new
                                                     {
@@ -86,7 +87,7 @@ namespace WebSellPhoneAPI.Controllers.Helper
             }
             var sanphams = await _context.Sanphams.Include(sp => sp.Hinhanhs)
                                                     .Include(s => s.Binhluans).ThenInclude(b => b.IdNdNavigation)
-                                                    .Where(sp => sp.Tenviettat == tenviettat)
+                                                    .Where(sp => sp.Tenviettat == tenviettat && sp.Trangthai != 0)
                                                     .ToListAsync();
 
             if (sanphams.Count == 0)

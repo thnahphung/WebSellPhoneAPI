@@ -24,10 +24,10 @@ namespace WebSellPhoneAPI.Controllers.Helper
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Donhang>>> GetDonhangs()
         {
-          if (_context.Donhangs == null)
-          {
-              return NotFound();
-          }
+            if (_context.Donhangs == null)
+            {
+                return NotFound();
+            }
             return await _context.Donhangs.ToListAsync();
         }
 
@@ -35,10 +35,10 @@ namespace WebSellPhoneAPI.Controllers.Helper
         [HttpGet("{id}")]
         public async Task<ActionResult<Donhang>> GetDonhang(int id)
         {
-          if (_context.Donhangs == null)
-          {
-              return NotFound();
-          }
+            if (_context.Donhangs == null)
+            {
+                return NotFound();
+            }
             var donhang = await _context.Donhangs.FindAsync(id);
 
             if (donhang == null)
@@ -85,29 +85,29 @@ namespace WebSellPhoneAPI.Controllers.Helper
         [HttpPost]
         public async Task<ActionResult<Donhang>> PostDonhang(Donhang donhang)
         {
-          if (_context.Donhangs == null)
-          {
-              return Problem("Entity set 'SellPhoneContext.Donhangs'  is null.");
-          }
+            if (_context.Donhangs == null)
+            {
+                return Problem("Entity set 'SellPhoneContext.Donhangs'  is null.");
+            }
 
             _context.Donhangs.Add(donhang);
             await _context.SaveChangesAsync();
 
             var chitietgiohangs = await _context.Chitietgiohangs.Include(s => s.IdSpNavigation).Where(c => c.IdNd == donhang.IdNd && c.Trangthai != 0).ToListAsync();
-           // Get product in the cart TO GET PRICE
-           
-            foreach(Chitietgiohang c in chitietgiohangs)
+            // Get product in the cart TO GET PRICE
+
+            foreach (Chitietgiohang c in chitietgiohangs)
             {
-            Chitietdonhang chitietdonhang = new Chitietdonhang();
+                Chitietdonhang chitietdonhang = new Chitietdonhang();
                 chitietdonhang.IdDh = donhang.Id;
-            chitietdonhang.IdSp = c.IdSp;
-            chitietdonhang.Soluong = c.Soluong;
-            chitietdonhang.Dongia = c.IdSpNavigation.Giadagiam * c.Soluong;
-            _context.Chitietdonhangs.Add(chitietdonhang);
+                chitietdonhang.IdSp = c.IdSp;
+                chitietdonhang.Soluong = c.Soluong;
+                chitietdonhang.Dongia = c.IdSpNavigation.Giadagiam * c.Soluong;
+                _context.Chitietdonhangs.Add(chitietdonhang);
             }
-            foreach(Chitietgiohang c in chitietgiohangs)
+            foreach (Chitietgiohang c in chitietgiohangs)
             {
-                 c.Trangthai = 0;
+                c.Trangthai = 0;
             }
 
             await _context.SaveChangesAsync();
