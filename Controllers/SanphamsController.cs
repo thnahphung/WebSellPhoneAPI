@@ -85,7 +85,7 @@ namespace WebSellPhoneAPI.Controllers
 
                 _context.Sanphams.Update(sanpham);
                 await _context.SaveChangesAsync();
-                return CreatedAtAction("GetSanpham", new { id = sanpham.Id }, sanpham);
+                return NoContent();
             }
 
             string fileName = sanpham.Tenviettat + "-" + Global.convertToUnSign3(sanpham.Mausanpham) + "-" + sanpham.Dungluong.Replace(" ", "") + "-" + sanpham.Ram.Replace(" ", "") + Path.GetExtension(sanpham.TenTepHinhAnh).ToLower();
@@ -128,7 +128,7 @@ namespace WebSellPhoneAPI.Controllers
                 }
             }
 
-            return CreatedAtAction("GetSanpham", new { id = sanpham.Id }, sanpham);
+            return NoContent();
         }
 
         // POST: api/Sanphams

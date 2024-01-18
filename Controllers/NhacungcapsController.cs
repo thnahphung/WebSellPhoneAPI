@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebSellPhoneAPI.Controllers.Helper;
 using WebSellPhoneAPI.Models;
 
 namespace WebSellPhoneAPI.Controllers
@@ -24,21 +25,21 @@ namespace WebSellPhoneAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Nhacungcap>>> GetNhacungcaps()
         {
-          if (_context.Nhacungcaps == null)
-          {
-              return NotFound();
-          }
-            return await _context.Nhacungcaps.ToListAsync();
+            if (_context.Nhacungcaps == null)
+            {
+                return NotFound();
+            }
+            return await _context.Nhacungcaps.Where(ncc => ncc.Trangthai == 1).ToListAsync();
         }
 
         // GET: api/Nhacungcaps/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Nhacungcap>> GetNhacungcap(int id)
         {
-          if (_context.Nhacungcaps == null)
-          {
-              return NotFound();
-          }
+            if (_context.Nhacungcaps == null)
+            {
+                return NotFound();
+            }
             var nhacungcap = await _context.Nhacungcaps.FindAsync(id);
 
             if (nhacungcap == null)
@@ -59,8 +60,32 @@ namespace WebSellPhoneAPI.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(nhacungcap).State = EntityState.Modified;
+            if (string.IsNullOrEmpty(nhacungcap.TepHinhAnh))
+            {
+                if (!string.IsNullOrEmpty(nhacungcap.Diachi))
+                {
+                    string newFileName = nhacungcap.TenNcc.ToLower() + "-" + "ico" + Path.GetExtension(Global.GetFileNameFromUrl(nhacungcap.Diachi)).ToLower();
+                    string newPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", newFileName);
 
+                    var oldPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", Global.GetFileNameFromUrl(nhacungcap.Diachi));
+                    Global.changeFileName(oldPath, newFileName);
+                    nhacungcap.Diachi = "http://103.77.214.148/images/" + newFileName;
+                }
+
+                _context.Nhacungcaps.Update(nhacungcap);
+                await _context.SaveChangesAsync();
+                return NoContent();
+            }
+
+            string fileName = nhacungcap.TenNcc.ToLower() + "-" + "ico" + Path.GetExtension(nhacungcap.TenTepHinhAnh).ToLower();
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", fileName);
+
+            Global.SaveImg(nhacungcap.TepHinhAnh, path);
+
+            nhacungcap.TepHinhAnh = null;
+            nhacungcap.Diachi = "http://103.77.214.148/images/" + fileName;
+            _context.Nhacungcaps.Update(nhacungcap);
+            await _context.SaveChangesAsync();
             try
             {
                 await _context.SaveChangesAsync();
@@ -85,11 +110,27 @@ namespace WebSellPhoneAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Nhacungcap>> PostNhacungcap(Nhacungcap nhacungcap)
         {
-          if (_context.Nhacungcaps == null)
-          {
-              return Problem("Entity set 'SellPhoneContext.Nhacungcaps'  is null.");
-          }
-            _context.Nhacungcaps.Add(nhacungcap);
+            if (_context.Nhacungcaps == null)
+            {
+                return Problem("Entity set 'SellPhoneContext.Nhacungcaps'  is null.");
+            }
+            if (string.IsNullOrEmpty(nhacungcap.TepHinhAnh))
+            {
+                await _context.Nhacungcaps.AddAsync(nhacungcap);
+                await _context.SaveChangesAsync();
+                return CreatedAtAction("GetNhacungcap", new { id = nhacungcap.Id }, nhacungcap);
+            }
+
+            string fileName = nhacungcap.TenNcc.ToLower() + "-" + "ico" + Path.GetExtension(nhacungcap.TenTepHinhAnh).ToLower();
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", fileName);
+
+            Global.SaveImg(nhacungcap.TepHinhAnh, path);
+
+            nhacungcap.TepHinhAnh = null;
+
+            nhacungcap.Diachi = "http://103.77.214.148/images/" + fileName;
+
+            await _context.Nhacungcaps.AddAsync(nhacungcap);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetNhacungcap", new { id = nhacungcap.Id }, nhacungcap);
@@ -104,12 +145,13 @@ namespace WebSellPhoneAPI.Controllers
                 return NotFound();
             }
             var nhacungcap = await _context.Nhacungcaps.FindAsync(id);
+            nhacungcap.Trangthai = 0;
             if (nhacungcap == null)
             {
                 return NotFound();
             }
 
-            _context.Nhacungcaps.Remove(nhacungcap);
+            _context.Nhacungcaps.Update(nhacungcap);
             await _context.SaveChangesAsync();
 
             return NoContent();
