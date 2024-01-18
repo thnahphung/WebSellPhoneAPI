@@ -24,22 +24,22 @@ namespace WebSellPhoneAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Donhang>>> GetDonhangs()
         {
-            if (_context.Donhangs == null)
-            {
-                return NotFound();
-            }
-            return await _context.Donhangs.Include(dh => dh.Chitietdonhangs).ThenInclude(c => c.IdSpNavigation).ToListAsync();
+          if (_context.Donhangs == null)
+          {
+              return NotFound();
+          }
+            return await _context.Donhangs.Include(d => d.IdNdNavigation).Include(d => d.IdDcNavigation).Include(dh => dh.Chitietdonhangs).ThenInclude(c => c.IdSpNavigation).ToListAsync();
         }
 
         // GET: api/Donhangs/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Donhang>> GetDonhang(int id)
         {
-            if (_context.Donhangs == null)
-            {
-                return NotFound();
-            }
-            var donhang = await _context.Donhangs.FindAsync(id);
+          if (_context.Donhangs == null)
+          {
+              return NotFound();
+          }
+            var donhang = await _context.Donhangs.Include(d => d.IdNdNavigation).Include(d => d.IdDcNavigation).FirstOrDefaultAsync(d => d.Id == id);
 
             if (donhang == null)
             {
@@ -82,6 +82,10 @@ namespace WebSellPhoneAPI.Controllers
             if (id != donhang.Id)
             {
                 return BadRequest();
+            }
+            if (donhang.Trangthai == 2)
+            {
+                donhang.Ngaythanhtoan = DateTime.Now;
             }
 
             _context.Entry(donhang).State = EntityState.Modified;

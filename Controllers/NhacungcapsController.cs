@@ -150,8 +150,7 @@ namespace WebSellPhoneAPI.Controllers
             {
                 return NotFound();
             }
-
-            _context.Nhacungcaps.Update(nhacungcap);
+            nhacungcap.Trangthai = 0;
             await _context.SaveChangesAsync();
 
             return NoContent();

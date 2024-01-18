@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Versioning;
 using WebSellPhoneAPI.Models;
 
 namespace WebSellPhoneAPI.Controllers
@@ -22,13 +23,19 @@ namespace WebSellPhoneAPI.Controllers
 
         // GET: api/Binhluans
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Binhluan>>> GetBinhluans()
+        public async Task<ActionResult<List<Binhluan>>> GetBinhluans()
         {
           if (_context.Binhluans == null)
           {
               return NotFound();
           }
-            return await _context.Binhluans.ToListAsync();
+          var binhluans = await _context.Binhluans.Include(bl => bl.IdNdNavigation).Include(bl => bl.IdSpNavigation).ToListAsync();
+
+            if (!binhluans.Any())
+            {
+                return NotFound();
+            }
+          return binhluans;
         }
 
         // GET: api/Binhluans/5
@@ -39,13 +46,13 @@ namespace WebSellPhoneAPI.Controllers
           {
               return NotFound();
           }
-            var binhluan = await _context.Binhluans.FindAsync(id);
+
+            var binhluan = await _context.Binhluans.Include(bl => bl.IdNdNavigation).Include(bl => bl.IdSpNavigation).FirstOrDefaultAsync(bl => bl.Id == id);
 
             if (binhluan == null)
             {
                 return NotFound();
             }
-
             return binhluan;
         }
 
@@ -109,7 +116,7 @@ namespace WebSellPhoneAPI.Controllers
                 return NotFound();
             }
 
-            binhluan.Trangthai = 0;
+            _context.Binhluans.Remove(binhluan);
             await _context.SaveChangesAsync();
 
             return NoContent();

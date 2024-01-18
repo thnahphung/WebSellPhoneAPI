@@ -91,6 +91,7 @@ namespace WebSellPhoneAPI.Controllers.Helper
             }
 
             _context.Donhangs.Add(donhang);
+            donhang.Ngaydathang = DateTime.Now;
             await _context.SaveChangesAsync();
 
             var chitietgiohangs = await _context.Chitietgiohangs.Include(s => s.IdSpNavigation).Where(c => c.IdNd == donhang.IdNd && c.Trangthai != 0).ToListAsync();
