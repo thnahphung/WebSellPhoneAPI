@@ -28,7 +28,7 @@ namespace WebSellPhoneAPI.Controllers
           {
               return NotFound();
           }
-            return await _context.Donhangs.ToListAsync();
+            return await _context.Donhangs.Include(d => d.IdNdNavigation).Include(d => d.IdDcNavigation).ToListAsync();
         }
 
         // GET: api/Donhangs/5
@@ -39,7 +39,7 @@ namespace WebSellPhoneAPI.Controllers
           {
               return NotFound();
           }
-            var donhang = await _context.Donhangs.FindAsync(id);
+            var donhang = await _context.Donhangs.Include(d => d.IdNdNavigation).Include(d => d.IdDcNavigation).FirstOrDefaultAsync(d => d.Id == id);
 
             if (donhang == null)
             {
@@ -82,6 +82,10 @@ namespace WebSellPhoneAPI.Controllers
             if (id != donhang.Id)
             {
                 return BadRequest();
+            }
+            if (donhang.Trangthai == 2)
+            {
+                donhang.Ngaythanhtoan = DateTime.Now;
             }
 
             _context.Entry(donhang).State = EntityState.Modified;
