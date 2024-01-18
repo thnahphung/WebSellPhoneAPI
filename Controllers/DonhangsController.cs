@@ -28,7 +28,7 @@ namespace WebSellPhoneAPI.Controllers
           {
               return NotFound();
           }
-            return await _context.Donhangs.Include(d => d.IdNdNavigation).Include(d => d.IdDcNavigation).ToListAsync();
+            return await _context.Donhangs.Include(d => d.IdNdNavigation).Include(d => d.IdDcNavigation).Include(dh => dh.Chitietdonhangs).ThenInclude(c => c.IdSpNavigation).ToListAsync();
         }
 
         // GET: api/Donhangs/5
@@ -64,8 +64,8 @@ namespace WebSellPhoneAPI.Controllers
             }
             foreach (Donhang d in donhangs)
             {
-            var chitietdonhangs = await _context.Chitietdonhangs.Where(c => c.IdDh == d.Id).ToListAsync();
-                foreach(Chitietdonhang c in chitietdonhangs)
+                var chitietdonhangs = await _context.Chitietdonhangs.Where(c => c.IdDh == d.Id).ToListAsync();
+                foreach (Chitietdonhang c in chitietdonhangs)
                 {
                     d.Chitietdonhangs.Add(c);
                 }
@@ -114,10 +114,10 @@ namespace WebSellPhoneAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Donhang>> PostDonhang(Donhang donhang)
         {
-          if (_context.Donhangs == null)
-          {
-              return Problem("Entity set 'SellPhoneContext.Donhangs'  is null.");
-          }
+            if (_context.Donhangs == null)
+            {
+                return Problem("Entity set 'SellPhoneContext.Donhangs'  is null.");
+            }
             _context.Donhangs.Add(donhang);
             await _context.SaveChangesAsync();
 
@@ -127,7 +127,7 @@ namespace WebSellPhoneAPI.Controllers
                 c.Dongia = c.IdSpNavigation.Giadagiam * c.Soluong;
             }
             await _context.SaveChangesAsync();
-         
+
             return CreatedAtAction("GetDonhang", new { id = donhang.Id }, donhang);
         }
 

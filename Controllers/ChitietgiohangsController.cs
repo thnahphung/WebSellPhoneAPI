@@ -24,10 +24,10 @@ namespace WebSellPhoneAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Chitietgiohang>>> GetChitietgiohangs()
         {
-          if (_context.Chitietgiohangs == null)
-          {
-              return NotFound();
-          }
+            if (_context.Chitietgiohangs == null)
+            {
+                return NotFound();
+            }
             return await _context.Chitietgiohangs.ToListAsync();
         }
 
@@ -35,10 +35,10 @@ namespace WebSellPhoneAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Chitietgiohang>> GetChitietgiohang(int id)
         {
-          if (_context.Chitietgiohangs == null)
-          {
-              return NotFound();
-          }
+            if (_context.Chitietgiohangs == null)
+            {
+                return NotFound();
+            }
             var chitietgiohang = await _context.Chitietgiohangs.FindAsync(id);
 
             if (chitietgiohang == null)
@@ -57,16 +57,16 @@ namespace WebSellPhoneAPI.Controllers
             {
                 return NotFound();
             }
-            var chitietgiohangs = await _context.Chitietgiohangs.Where(c => c.IdNd == userId && c.Trangthai != 0).ToListAsync();
-            
+            var chitietgiohangs = await _context.Chitietgiohangs.Include(c => c.IdSpNavigation).ThenInclude(sp => sp.Hinhanhs).Where(c => c.IdNd == userId && c.Trangthai != 0).ToListAsync();
+
             if (chitietgiohangs == null || !chitietgiohangs.Any())
             {
                 return NotFound();
             }
-            foreach(Chitietgiohang c in chitietgiohangs)
-            {
-                c.IdSpNavigation = await _context.Sanphams.FindAsync(c.IdSp);
-            }
+            //foreach (Chitietgiohang c in chitietgiohangs)
+            //{
+            //    c.IdSpNavigation = await _context.Sanphams.FindAsync(c.IdSp);
+            //}
 
             return chitietgiohangs;
         }
@@ -106,11 +106,11 @@ namespace WebSellPhoneAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Chitietgiohang>> PostChitietgiohang(Chitietgiohang chitietgiohang)
         {
-          if (_context.Chitietgiohangs == null)
-          {
-              return Problem("Entity set 'SellPhoneContext.Chitietgiohangs'  is null.");
-          }
-          
+            if (_context.Chitietgiohangs == null)
+            {
+                return Problem("Entity set 'SellPhoneContext.Chitietgiohangs'  is null.");
+            }
+
             _context.Chitietgiohangs.Add(chitietgiohang);
             try
             {
@@ -140,7 +140,7 @@ namespace WebSellPhoneAPI.Controllers
                 return NotFound();
             }
             var chitietgiohangs = await _context.Chitietgiohangs
-           .Where(c => c.IdNd == idND && c.Trangthai != 0) 
+           .Where(c => c.IdNd == idND && c.Trangthai != 0)
            .ToListAsync();
             if (chitietgiohangs == null || !chitietgiohangs.Any())
             {
@@ -150,10 +150,10 @@ namespace WebSellPhoneAPI.Controllers
             foreach (Chitietgiohang c in chitietgiohangs)
             {
 
-            c.Trangthai = 0;
+                c.Trangthai = 0;
             }
             await _context.SaveChangesAsync();
-  
+
 
             return NoContent();
         }
